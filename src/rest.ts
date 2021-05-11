@@ -81,24 +81,19 @@ export async function queryProcesses(maxRecords: number = 1) {
     return output;
 }
 
-    // // GET request
-    // try {
-    //   const data = await requestAPI<any>('get_example');
-    //   console.log(data);
-    // } catch (reason) {
-    //   console.error(`The jlab_aiidatree server extension appears to be missing.\n${reason}`);
-    // }
-
-    // POST request
-    // const dataToSend = { max_records: 5 };
-    // try {
-    //   const reply = await requestAPI<any>('processes', {
-    //     body: JSON.stringify(dataToSend),
-    //     method: 'POST'
-    //   });
-    //   console.log(reply);
-    // } catch (reason) {
-    //   console.error(
-    //     `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
-    //   );
-    // }
+export async function queryNode(pk: number) {
+  const dataToSend = { pk };
+  let reply: any
+  try {
+    reply = await requestAPI<any>('node', {
+      body: JSON.stringify(dataToSend),
+      method: 'POST'
+    });
+  } catch (reason) {
+    console.error(
+      `Error on POST /jlab_aiidatree/node ${dataToSend}.\n${reason}`
+    );
+    // TODO deal with errors
+  }
+  return reply;
+}

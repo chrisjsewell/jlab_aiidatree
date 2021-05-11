@@ -22,10 +22,11 @@ def _json_serial(obj):
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
+    return str(obj)
 
 
 def serialize(obj) -> str:
+    # TODO there is probably a sqlalchemy function for this
     return json.dumps(obj, default=_json_serial)
 
 
@@ -34,6 +35,13 @@ def query_settings(**kwargs):
         result = conn.execute(text("SELECT * from db_dbsetting"))
         output = result.all()
     return output
+
+
+def query_node(pk: int, **kwargs):
+    with connection(**kwargs) as conn:
+        result = conn.execute(text("SELECT * from db_dbnode where db_dbnode.id=:pk"), pk=pk)
+        row = result.one()
+    return dict(zip(row.keys(), row))
 
 
 def query_processes(max_records: int = 1, **kwargs):
@@ -45,7 +53,8 @@ def query_processes(max_records: int = 1, **kwargs):
                 + "n.attributes -> 'exit_status', n.attributes -> 'scheduler_state', n.attributes -> 'paused', 'statusUnknown'"
                 + "from db_dbnode as n where n.process_type is not null "
                 + "ORDER BY n.mtime DESC LIMIT :limit",
-            ), limit=max_records
+            ),
+            limit=max_records,
         )
         rows = result.all()
     names = [

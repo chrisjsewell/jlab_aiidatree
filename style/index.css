@@ -102,3 +102,8 @@
     color: white;
     background: var(--jp-brand-color1);
 }
+
+.aiidatree-yaml {
+    padding-left: 12px;
+    overflow: scroll;
+}
