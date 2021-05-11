@@ -42,7 +42,7 @@ export class AiidaTreeWidget extends Widget {
         super();
         this.id = id;
         this.title.iconClass = "aiidatree-icon";
-        this.title.caption = "AiiDA Tree";
+        this.title.caption = "AiiDA Explorer";
         this.title.closable = true;
         this.addClass("jp-aiidatreeWidget");
         this.addClass(id);
@@ -254,13 +254,15 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
                 let next_element: HTMLElement
                 let next_elements: HTMLElement[] = []
                 let icon: LabIcon
+                let arrow: '→' | '←'
                 for (const direction of ["incoming", "outgoing"]) {
                     const links = await queryLinks(pk, direction as "incoming" | "outgoing")
                     for (const link of links) {
                         // Take the last part of the entry point
                         const typeElements = link.nodeType.split('.')
                         icon = getIcon(link.nodeType)
-                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], ''], `${pk}/${link.nodeId}`, icon)
+                        arrow = direction === 'incoming' ? '→' : '←'
+                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], arrow], `${pk}/${link.nodeId}`, icon)
                         next_element.className += ` aiidatree-link-item aiidatree-link-${direction}`
                         next_element.oncontextmenu = () => {
                             widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
