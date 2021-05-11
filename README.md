@@ -1,6 +1,6 @@
 # jlab_aiidatree
 
-![Github Actions Status](https://github.com/github_username/jlab_aiidatree/workflows/Build/badge.svg)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/github_username/jlab_aiidatree/main?urlpath=lab)
+![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
 
 A JupyterLab extension.
 
