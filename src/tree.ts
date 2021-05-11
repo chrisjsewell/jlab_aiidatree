@@ -13,6 +13,7 @@ import * as consts from './consts'
 import { queryLinks, queryNode, queryProcesses } from './rest';
 import { dump } from 'js-yaml';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { Output3DWidget } from './threejs_viewer';
 
 
 export function constructTreeWidget(app: JupyterFrontEnd,
@@ -29,7 +30,7 @@ export function constructTreeWidget(app: JupyterFrontEnd,
 export class AiidaTreeWidget extends Widget {
 
     public commands: CommandRegistry;
-    public dbSettings: {[key: string]: any}
+    public dbSettings: { [key: string]: any }
     public toolbar: Toolbar;
     public processTable: HTMLTableElement;
     // public tree: HTMLElement;
@@ -50,7 +51,7 @@ export class AiidaTreeWidget extends Widget {
         this.addClass(id);
 
         this.refreshSettings(loadedSettings)
-        loadedSettings.changed.connect(() => {this.refreshSettings(loadedSettings)})
+        loadedSettings.changed.connect(() => { this.refreshSettings(loadedSettings) })
 
         this.commands = app.commands;
 
@@ -87,7 +88,7 @@ export class AiidaTreeWidget extends Widget {
 
     public refreshSettings(loadedSettings: ISettingRegistry.ISettings) {
         const keys = ["host", "port", "user", "database", "password"]
-        this.dbSettings = keys.reduce((d, k) => {d[k] = loadedSettings.get(k).composite; return d}, {} as {[key: string]: any})
+        this.dbSettings = keys.reduce((d, k) => { d[k] = loadedSettings.get(k).composite; return d }, {} as { [key: string]: any })
     }
 
     public async refresh() {
@@ -274,10 +275,11 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
                     for (const link of links) {
                         // Take the last part of the entry point
                         const typeElements = link.nodeType.split('.')
+                        const name = typeElements[typeElements.length - 2]
                         icon = getIcon(link.nodeType)
                         arrow = direction === 'incoming' ? '→' : '←'
-                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length - 2], arrow], `${pk}/${link.nodeId}`, icon)
-                        next_element.className += ` aiidatree-link-item aiidatree-link-${direction}`
+                        next_element = widget.buildTableRow([link.nodeId, name, arrow], `${pk}/${link.nodeId}`, icon)
+                        next_element.className += ` aiidatree-link-item aiidatree-link-${direction} aiidatree-item-${name}`
                         next_element.oncontextmenu = () => {
                             widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
                         };
@@ -322,7 +324,19 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
             inspect_widget.node.appendChild(pre)
             app.shell.add(inspect_widget, 'main');
         },
-        label: "Inspect"
+    label: "Inspect"
+    })
+
+    app.commands.addCommand(CommandIDs.launchThreeJS + ":" + widget.id, {
+        execute: async (args) => {
+            const pk = typeof args['pk'] === 'undefined' ? widget.selected_pk : args['pk'] as number;
+            let data = await queryNode(pk, widget.dbSettings)
+            const threejs_widget = new Output3DWidget(`${widget.id}-view-${pk}`, `Visualise Structure ${pk}`)
+            app.shell.add(threejs_widget, 'main');
+            threejs_widget.initialise()
+            threejs_widget.renderStructureData(data)
+        },
+        label: "Visualise"
     })
 }
 
@@ -332,6 +346,12 @@ function createItemsContextMenu(app: JupyterFrontEnd, widget: Widget) {
         rank: 3,
         selector: "div." + widget.id + " > table > *> .aiidatree-item",
     });
+    app.contextMenu.addItem({
+        command: CommandIDs.launchThreeJS + ":" + widget.id,
+        rank: 3,
+        selector: "div." + widget.id + " > table > *> .aiidatree-item-StructureData",
+    });
+
 }
 
 function createMainToolbar(app: JupyterFrontEnd, widget: AiidaTreeWidget) {

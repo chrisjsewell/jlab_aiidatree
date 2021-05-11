@@ -659,6 +659,11 @@
   resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.1.tgz#18845205e86ff0038517aab7a18a62a6b9f71275"
   integrity sha512-EaCxbanVeyxDRTQBkdLb3Bvl/HK7PBK6UJjsSixB0iHKoWxE5uu2Q/DgtpOhPIojN0Zl1whvOd7PoHs2P0s5eA==
 
+"@types/three@^0.127.0":
+  version "0.127.1"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.127.1.tgz#0978054e5daa6485946a3f1518a76412186ae81f"
+  integrity sha512-e90iYq3zde3axANg7BPZY0fKrez1AzveamIIFk23PMh9WtCx91geokDy+yEAIymdIldgUpvezAP6+zCV3oekXw==
+
 "@typescript-eslint/eslint-plugin@^4.8.1":
   version "4.23.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-4.23.0.tgz#29d3c9c81f6200b1fd6d8454cfb007ba176cde80"
@@ -3538,6 +3543,11 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+three@^0.127.0:
+  version "0.127.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.127.0.tgz#c463f4d41b2c735dcf8e9e51a388815e80cd3791"
+  integrity sha512-wtgrn+mhYUbobxT7QN3GPdu3SRpSBQvwY6uOzLChWS7QE//f7paDU/+wlzbg+ngeIvBBqjBHSRuywTh8A99Jng==
 
 through@^2.3.6:
   version "2.3.8"
