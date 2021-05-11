@@ -47,7 +47,9 @@
   "dependencies": {
     "@jupyterlab/application": "^3.0.0",
     "@jupyterlab/coreutils": "^5.0.0",
-    "@jupyterlab/services": "^6.0.0"
+    "@jupyterlab/services": "^6.0.0",
+    "@types/lodash": "^4.14.168",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",

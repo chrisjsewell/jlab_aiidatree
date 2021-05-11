@@ -1,1 +1,92 @@
 @import url('base.css');
+
+:root {
+    --indent: 1em;
+    --aiidatree-icon-light: url('aiida-icon.svg');
+    --aiidatree-icon-dark: url('aiida-icon.svg');
+    --aiidatree-icon: var(--aiidatree-icon-dark);
+}
+
+[data-jp-theme-light="true"] .aiidatree-icon {
+    --aiidatree-icon: var(--aiidatree-icon-light);
+}
+
+[data-jp-theme-light="false"] .aiidatree-icon {
+    --aiidatree-icon: var(--aiidatree-icon-dark);
+}
+
+.aiidatree-icon {
+    background-image: var(--aiidatree-icon);
+    min-width: 20px;
+    min-height: 20px;
+    background-size: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto;
+}
+
+.jp-aiidatreeWidget {
+    background: var(--jp-layout-color1);
+    overflow: auto;
+    color: var(--jp-ui-font-color1);
+    /* This is needed so that all font sizing of children done in ems is
+     * relative to this base size */
+    font-size: var(--jp-ui-font-size1);
+}
+
+/* AiidaTreeWidget.buildHTMLTable */
+
+.aiidatree-head {
+    width: 100%;
+    border-spacing: 0px;
+    overflow: scroll;
+}
+
+.aiidatree-header {
+    /* Chrome all / Safari all */
+    -webkit-user-select: none;
+    /* Firefox all */
+    -moz-user-select: none;
+    /* IE 10+ */
+    -ms-user-select: none;
+    border: var(--jp-border-width) solid var(--jp-border-color2);
+    border-left: none;
+    font-size: var(--jp-ui-font-size0);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0px;
+    padding: 8px 12px;
+    text-transform: uppercase;
+    overflow: hidden;
+    white-space: nowrap;
+    /* text-align: left; */
+}
+
+.aiidatree-header.modified {
+    border-right: none;
+}
+
+.aiidatree-item {
+    -webkit-user-select: none;
+    /* Chrome all / Safari all */
+    -moz-user-select: none;
+    /* Firefox all */
+    -ms-user-select: none;
+    /* IE 10+ */
+    text-align: center;
+    padding-top: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.aiidatree-item:hover {
+    cursor: pointer;
+    background-color: var(--jp-input-hover-background);
+}
+
+.aiidatree-item.selected {
+    color: white;
+    background: var(--jp-brand-color1);
+}

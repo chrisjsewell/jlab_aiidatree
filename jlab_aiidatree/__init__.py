@@ -17,7 +17,7 @@ def _jupyter_labextension_paths():
 
 
 
-from .handlers import setup_handlers
+from .rest import setup_handlers
 
 
 def _jupyter_server_extension_points():
