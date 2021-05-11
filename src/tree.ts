@@ -3,12 +3,13 @@ import { CommandRegistry } from '@lumino/commands';
 import { PanelLayout, Widget } from "@lumino/widgets";
 import { Toolbar, ToolbarButton } from "@jupyterlab/apputils";
 import { ILayoutRestorer, JupyterFrontEnd } from "@jupyterlab/application";
-import { refreshIcon } from "@jupyterlab/ui-components";
+import { LabIcon, refreshIcon } from "@jupyterlab/ui-components";
 
 import { sortBy } from 'lodash';
 
 import "../style/index.css";
 import { CommandIDs } from './consts';
+import * as consts from './consts'
 import { queryLinks, queryNode, queryProcesses } from './rest';
 import { dump } from 'js-yaml';
 
@@ -113,15 +114,23 @@ export class AiidaTreeWidget extends Widget {
         return { table, tbody };
     }
 
-    public buildTableRow(row: any[], id: string) {
+    public buildTableRow(row: any[], id: string, icon: LabIcon) {
         const tr = document.createElement("tr");
-        for (const column of row) {
+        
+        row.forEach((column, index) => {
             const td = document.createElement("td");
+            if (index === 0) {
+                td.className = "aiidatree-first-column"
+                icon.element({container: td, marginRight: "6px", maxHeight: "12px"});
+            }
             const content = document.createElement("span");
             content.innerHTML = `${column}`;
             td.appendChild(content);
             tr.appendChild(td);
-        }
+        });
+        // for (const column of row) {
+
+        // }
         tr.className = "aiidatree-item";
         tr.id = id
         return tr;
@@ -134,7 +143,7 @@ export class AiidaTreeWidget extends Widget {
         for (const process of processes) {
             // TODO should do that filtering at the query level
             if (this.selectProcessState.value === "all" || process.processState === this.selectProcessState.value) {
-                const tr = this.buildTableRow([process.id, process.processLabel, process.processState.toUpperCase()], `${process.id}`)
+                const tr = this.buildTableRow([process.id, process.processLabel, process.processState.toUpperCase()], `${process.id}`, consts.rocketIcon)
                 html.tbody.appendChild(tr);
                 tr.className += " jp-icon-selectable"
                 tr.oncontextmenu = () => {
@@ -244,15 +253,21 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
                 // child elements need to be constructed
                 let next_element: HTMLElement
                 let next_elements: HTMLElement[] = []
+                let icon: LabIcon
                 for (const direction of ["incoming", "outgoing"]) {
                     const links = await queryLinks(pk, direction as "incoming" | "outgoing")
                     for (const link of links) {
                         // Take the last part of the entry point
                         const typeElements = link.nodeType.split('.')
-                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], ''], `${pk}/${link.nodeId}`)
+                        icon = getIcon(link.nodeType)
+                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], ''], `${pk}/${link.nodeId}`, icon)
                         next_element.className += ` aiidatree-link-item aiidatree-link-${direction}`
                         next_element.oncontextmenu = () => {
                             widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
+                        };
+                        next_element.onclick = () => {
+                            widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
+                            widget.commands.execute(CommandIDs.select + ":" + widget.id, { pk: link.nodeId });
                         };
                         next_elements.push(next_element)
                     }
@@ -312,4 +327,27 @@ function createMainToolbar(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
         tooltip: "Refresh",
     });
     widget.toolbar.addItem("refresh", refresh);
+}
+
+
+const nodeIconMatches: { type: string, icon: LabIcon }[] = [
+    { type: 'data.code', icon: consts.terminalIcon },
+    { type: 'data.dict', icon: consts.listUnorderedIcon },
+    { type: 'data.remote', icon: consts.linkExternalIcon },
+    { type: 'data.folder', icon: consts.archiveIcon },
+    { type: 'data.structure', icon: consts.beakerIcon },
+    { type: 'data', icon: consts.graphIcon },
+    { type: 'process.calculation', icon: consts.calculatorIcon },
+    { type: 'process', icon: consts.rocketIcon }
+]
+
+function getIcon(typeString: string){
+        let finalIcon = consts.fileIcon
+        for (const { type, icon } of nodeIconMatches) {
+            if (typeString.startsWith(type)) {
+                finalIcon = icon
+                break
+            }
+        }
+        return finalIcon
 }

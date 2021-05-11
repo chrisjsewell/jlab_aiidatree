@@ -80,6 +80,10 @@
     border-right: none;
 }
 
+.aiidatree-first-column {
+    text-align: left;
+}
+
 .aiidatree-item {
     -webkit-user-select: none;
     /* Chrome all / Safari all */
@@ -103,8 +107,8 @@
     background: var(--jp-brand-color1);
 }
 
-.aiidatree-link-item {
-    text-align: right;
+.aiidatree-link-item .aiidatree-first-column {
+    padding-left: 12px;
 }
 
 .aiidatree-link-incoming {
