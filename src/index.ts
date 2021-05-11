@@ -17,7 +17,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     console.log('JupyterLab extension jlab_aiidatree is activated!');
 
     const widget = constructTreeWidget(app, "jlab_aiidatree", "left", resolver)
-    await widget.buildProcessesTable()
+    await widget.refresh()
   }
 };
 

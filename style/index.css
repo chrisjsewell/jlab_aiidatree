@@ -36,6 +36,18 @@
     font-size: var(--jp-ui-font-size1);
 }
 
+.filetree-toolbar {
+    padding: 0px;
+    border-bottom: none;
+    height: auto;
+    margin: var(--jp-toolbar-header-margin);
+    box-shadow: none;
+}
+
+.filetree-toolbar .jp-ToolbarButtonComponent {
+    padding: 0px 16px;
+}
+
 /* AiidaTreeWidget.buildHTMLTable */
 
 .aiidatree-head {
