@@ -107,3 +107,7 @@
     padding-left: 12px;
     overflow: scroll;
 }
+
+.aiidatree-process-select {
+    float: right;
+}

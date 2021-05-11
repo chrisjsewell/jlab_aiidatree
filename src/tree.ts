@@ -31,6 +31,7 @@ export class AiidaTreeWidget extends Widget {
     public toolbar: Toolbar;
     public processTable: HTMLTableElement;
     // public tree: HTMLElement;
+    public selectProcessState: HTMLSelectElement;
     public selected_pk: number | undefined;
 
     public constructor(
@@ -55,6 +56,27 @@ export class AiidaTreeWidget extends Widget {
         this.layout = layout;
 
         this.selected_pk = undefined;
+
+        // const label = document.createElement("label");
+        // this.node.appendChild(label)
+        // label.htmlFor = "selection"
+        const select = document.createElement("select");
+        select.className = "aiidatree-process-select"
+        select.name = `${this.id}-selection`
+        select.id = select.name
+        const states = ['all', 'created', 'running', 'waiting', 'finished', 'excepted', 'killed']
+        for (const state of states) {
+            const option = document.createElement("option");
+            option.value = state
+            option.innerHTML = state.toUpperCase()
+            select.appendChild(option)
+        }
+        this.node.appendChild(select)
+        this.selectProcessState = select
+        select.onchange = async () => {
+            await this.refresh()
+        }
+
     }
 
     public async refresh() {
@@ -116,15 +138,17 @@ export class AiidaTreeWidget extends Widget {
         processes = sortBy(processes, ['id'])
         const html = this.buildHTMLTable(['id', 'Label', 'State']);
         for (const process of processes) {
-            const tr = this.buildTableRow(html.tbody, [process.id, process.processLabel, process.processState], 1, "", `${process.id}`)
-            tr.oncontextmenu = () => {
-                this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
-            };
-            tr.onclick = () => {
-                this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
-            };
-            tr.ondblclick = () => {
-                this.commands.execute(CommandIDs.inspectNode + ":" + this.id, { pk: process.id })
+            if (this.selectProcessState.value === "all" || process.processState === this.selectProcessState.value) {
+                const tr = this.buildTableRow(html.tbody, [process.id, process.processLabel, process.processState.toUpperCase()], 1, "", `${process.id}`)
+                tr.oncontextmenu = () => {
+                    this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
+                };
+                tr.onclick = () => {
+                    this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
+                };
+                tr.ondblclick = () => {
+                    this.commands.execute(CommandIDs.inspectNode + ":" + this.id, { pk: process.id })
+                }
             }
         }
         this.processTable = html.table
