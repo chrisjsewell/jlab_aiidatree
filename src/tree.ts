@@ -9,7 +9,7 @@ import { sortBy } from 'lodash';
 
 import "../style/index.css";
 import { CommandIDs } from './consts';
-import { queryNode, queryProcesses } from './rest';
+import { queryLinks, queryNode, queryProcesses } from './rest';
 import { dump } from 'js-yaml';
 
 
@@ -113,13 +113,7 @@ export class AiidaTreeWidget extends Widget {
         return { table, tbody };
     }
 
-    public buildTableRow(tree: HTMLElement, row: any[], level: number, parent: any, id: string) {
-        const tr = this.createTreeElement(row, level, id);
-        tree.appendChild(tr);
-        return tr
-    }
-
-    public createTreeElement(row: any[], level: number, id: string) {
+    public buildTableRow(row: any[], id: string) {
         const tr = document.createElement("tr");
         for (const column of row) {
             const td = document.createElement("td");
@@ -136,19 +130,28 @@ export class AiidaTreeWidget extends Widget {
     public async buildProcessesTable() {
         let processes = await queryProcesses(100)
         processes = sortBy(processes, ['id'])
-        const html = this.buildHTMLTable(['id', 'Label', 'State']);
+        const html = this.buildHTMLTable(['PK', 'Label', 'State']);
         for (const process of processes) {
+            // TODO should do that filtering at the query level
             if (this.selectProcessState.value === "all" || process.processState === this.selectProcessState.value) {
-                const tr = this.buildTableRow(html.tbody, [process.id, process.processLabel, process.processState.toUpperCase()], 1, "", `${process.id}`)
+                const tr = this.buildTableRow([process.id, process.processLabel, process.processState.toUpperCase()], `${process.id}`)
+                html.tbody.appendChild(tr);
+                tr.className += " jp-icon-selectable"
                 tr.oncontextmenu = () => {
                     this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
                 };
-                tr.onclick = () => {
+                tr.onclick = (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
                     this.commands.execute(CommandIDs.setContext + ":" + this.id, { pk: process.id });
+                    this.commands.execute(CommandIDs.toggle + ":" + this.id, {
+                        pk: process.id,
+                    });
                 };
-                tr.ondblclick = () => {
-                    this.commands.execute(CommandIDs.inspectNode + ":" + this.id, { pk: process.id })
-                }
+                // can interfere with toggling
+                // tr.ondblclick = () => {
+                //     this.commands.execute(CommandIDs.inspectNode + ":" + this.id, { pk: process.id })
+                // }
             }
         }
         this.processTable = html.table
@@ -210,6 +213,54 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
         },
         label: "Select",
     });
+
+    app.commands.addCommand(CommandIDs.toggle + ":" + widget.id, {
+        execute: async (args) => {
+            const pk = args.pk as number;
+
+            let row_element = widget.node.querySelector<HTMLElement>(
+                `[id='${pk}']`,
+            );
+
+            if (
+                row_element.nextElementSibling &&
+                row_element.nextElementSibling.id.startsWith(`${pk}/`)
+            ) {
+                // child elements already constructed and need to be removed
+                const remove_elements = []
+                while (
+                    row_element.nextElementSibling &&
+                    row_element.nextElementSibling.id.startsWith(`${pk}/`)
+                ) {
+                    row_element = widget.node.querySelector(
+                        "[id='" + row_element.nextElementSibling.id + "']",
+                    );
+                    remove_elements.push(row_element)
+                }
+                for (const element of remove_elements) {
+                    element.remove()
+                }
+            } else {
+                // child elements need to be constructed
+                let next_element: HTMLElement
+                let next_elements: HTMLElement[] = []
+                for (const direction of ["incoming", "outgoing"]) {
+                    const links = await queryLinks(pk, direction as "incoming" | "outgoing")
+                    for (const link of links) {
+                        // Take the last part of the entry point
+                        const typeElements = link.nodeType.split('.')
+                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], ''], `${pk}/${link.nodeId}`)
+                        next_element.className += ` aiidatree-link-item aiidatree-link-${direction}`
+                        next_element.oncontextmenu = () => {
+                            widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
+                        };
+                        next_elements.push(next_element)
+                    }
+                }
+                row_element.after(...next_elements)
+            }
+        }
+    })
 
     app.commands.addCommand(CommandIDs.inspectNode + ":" + widget.id, {
         execute: async (args) => {

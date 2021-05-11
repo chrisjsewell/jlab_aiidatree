@@ -3,4 +3,5 @@ export const CommandIDs = {
     inspectNode: "aiidatree:nodeData",
     setContext: "aiidatree:setContext",
     select: "aiidatree:select",
+    toggle: "aiidatree:toggle",
 }

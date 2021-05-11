@@ -47,11 +47,29 @@ class ProcessesEndpoint(APIHandler):
         self.finish(json_data)
 
 
+class LinksEndpoint(APIHandler):
+    @tornado.web.authenticated
+    def post(self):
+        # input_data is a dictionary with a key "name"
+        input_data = self.get_json_body()
+        pk = input_data.get("pk", 1)
+        direction = input_data.get("direction", "incoming")
+        try:
+            if direction == "incoming":
+                data = postgres.query_incoming(pk=pk)
+            else:
+                data = postgres.query_outgoing(pk=pk)
+            json_data = postgres.serialize(data)
+        except Exception as error:
+            json_data = postgres.serialize({"error": str(error)})
+        self.finish(json_data)
+
+
 def setup_handlers(web_app):
     host_pattern = ".*$"
     base_url = web_app.settings["base_url"]
     handlers = [
         (url_path_join(base_url, "jlab_aiidatree", endpoint), handler)
-        for endpoint, handler in [("processes", ProcessesEndpoint), ("node", NodeEndpoint)]
+        for endpoint, handler in [("processes", ProcessesEndpoint), ("node", NodeEndpoint), ("links", LinksEndpoint)]
     ]
     web_app.add_handlers(host_pattern, handlers)

@@ -39,7 +39,9 @@ def query_settings(**kwargs):
 
 def query_node(pk: int, **kwargs):
     with connection(**kwargs) as conn:
-        result = conn.execute(text("SELECT * from db_dbnode where db_dbnode.id=:pk"), pk=pk)
+        result = conn.execute(
+            text("SELECT * from db_dbnode where db_dbnode.id=:pk"), pk=pk
+        )
         row = result.one()
     return dict(zip(row.keys(), row))
 
@@ -70,5 +72,51 @@ def query_processes(max_records: int = 1, **kwargs):
         "exitStatus",
         "schedulerState",
         "paused",
+    ]
+    return {"fields": names, "rows": [list(row) for row in rows]}
+
+
+def query_incoming(pk: int, **kwargs):
+    with connection(**kwargs) as conn:
+        result = conn.execute(
+            text(
+                "SELECT 'incoming', l.label, l.type, n.id, n.label, n.description, n.node_type from db_dblink as l "
+                "LEFT JOIN db_dbnode as n ON n.id = l.input_id "
+                "WHERE l.output_id=:pk ORDER BY n.mtime DESC"
+            ),
+            pk=pk,
+        )
+        rows = result.all()
+    names = [
+        "linkDirection",
+        "linkLabel",
+        "linkType",
+        "nodeId",
+        "nodeLabel",
+        "nodeDescription",
+        "nodeType",
+    ]
+    return {"fields": names, "rows": [list(row) for row in rows]}
+
+
+def query_outgoing(pk: int, **kwargs):
+    with connection(**kwargs) as conn:
+        result = conn.execute(
+            text(
+                "SELECT 'outgoing', l.label, l.type, n.id, n.label, n.description, n.node_type from db_dblink as l "
+                "LEFT JOIN db_dbnode as n ON n.id = l.output_id "
+                "WHERE l.input_id=:pk ORDER BY n.mtime DESC"
+            ),
+            pk=pk,
+        )
+        rows = result.all()
+    names = [
+        "linkDirection",
+        "linkLabel",
+        "linkType",
+        "nodeId",
+        "nodeLabel",
+        "nodeDescription",
+        "nodeType",
     ]
     return {"fields": names, "rows": [list(row) for row in rows]}

@@ -103,6 +103,18 @@
     background: var(--jp-brand-color1);
 }
 
+.aiidatree-link-item {
+    text-align: right;
+}
+
+.aiidatree-link-incoming {
+    color: var(--jp-content-font-color1);
+}
+
+.aiidatree-link-outgoing {
+    color: var(--jp-content-font-color2);
+}
+
 .aiidatree-yaml {
     padding-left: 12px;
     overflow: scroll;

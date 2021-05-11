@@ -97,3 +97,32 @@ export async function queryNode(pk: number) {
   }
   return reply;
 }
+
+export interface NodeLink {
+  linkDirection: 'incoming' | 'outgoing',
+  linkLabel: string,
+  linkType: string,
+  nodeId: number,
+  nodeLabel: string,
+  nodeDescription: string,
+  nodeType: string
+}
+
+export async function queryLinks(pk: number, direction: "incoming" | "outgoing") {
+  const dataToSend = { pk, direction };
+  let reply: {rows: any[], fields: string[]}
+  try {
+    reply = await requestAPI<any>('links', {
+      body: JSON.stringify(dataToSend),
+      method: 'POST'
+    });
+  } catch (reason) {
+    console.error(
+      `Error on POST /jlab_aiidatree/links ${dataToSend}.\n${reason}`
+    );
+    // TODO deal with errors
+  }
+  const output = reply.rows.map(row => (lodash.zipObject(reply.fields, row) as unknown as NodeLink))
+  
+  return output;
+}
