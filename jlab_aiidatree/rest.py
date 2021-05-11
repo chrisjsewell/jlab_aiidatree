@@ -13,7 +13,7 @@ class NodeEndpoint(APIHandler):
         # input_data is a dictionary with a key "name"
         input_data = self.get_json_body()
         try:
-            data = postgres.query_node(pk=input_data.get("pk", 1))
+            data = postgres.query_node(**(input_data or {}))
             json_data = postgres.serialize(data)
         except Exception as error:
             json_data = postgres.serialize({"error": str(error)})
@@ -40,7 +40,7 @@ class ProcessesEndpoint(APIHandler):
         # input_data is a dictionary with a key "name"
         input_data = self.get_json_body()
         try:
-            data = postgres.query_processes(max_records=input_data.get("max_records", 1))
+            data = postgres.query_processes(**(input_data or {}))
             json_data = postgres.serialize(data)
         except Exception as error:
             json_data = postgres.serialize({"error": str(error)})
@@ -51,14 +51,13 @@ class LinksEndpoint(APIHandler):
     @tornado.web.authenticated
     def post(self):
         # input_data is a dictionary with a key "name"
-        input_data = self.get_json_body()
-        pk = input_data.get("pk", 1)
-        direction = input_data.get("direction", "incoming")
+        input_data = self.get_json_body() or {}
+        direction = input_data.pop("direction", "incoming")
         try:
             if direction == "incoming":
-                data = postgres.query_incoming(pk=pk)
+                data = postgres.query_incoming(**(input_data or {}))
             else:
-                data = postgres.query_outgoing(pk=pk)
+                data = postgres.query_outgoing(**(input_data or {}))
             json_data = postgres.serialize(data)
         except Exception as error:
             json_data = postgres.serialize({"error": str(error)})

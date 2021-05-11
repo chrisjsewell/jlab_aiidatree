@@ -1,0 +1,27 @@
+{
+  "title": "AiiDA Explorer",
+  "description": "Parameters for connecting to the postgres database.",
+  "type": "object",
+  "properties": {
+    "host": {
+      "type": "string",
+      "default": "localhost"
+    },
+    "port": {
+      "type": "number",
+      "default": 5432
+    },
+    "user": {
+      "type": "string",
+      "default": "aiida"
+    },
+    "database": {
+      "type": "string",
+      "default": "aiidadb"
+    },
+    "password": {
+      "type": "string",
+      "default": "password"
+    }
+  }
+}

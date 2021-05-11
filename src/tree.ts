@@ -12,11 +12,12 @@ import { CommandIDs } from './consts';
 import * as consts from './consts'
 import { queryLinks, queryNode, queryProcesses } from './rest';
 import { dump } from 'js-yaml';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 
 export function constructTreeWidget(app: JupyterFrontEnd,
-    id: string, side: string = "left", restorer: ILayoutRestorer) {
-    const widget = new AiidaTreeWidget(app, id);
+    id: string, side: string = "left", restorer: ILayoutRestorer, loadedSettings: ISettingRegistry.ISettings) {
+    const widget = new AiidaTreeWidget(app, id, loadedSettings);
     restorer.add(widget, widget.id);
     app.shell.add(widget, side);
     createCoreCommands(app, widget);
@@ -25,10 +26,10 @@ export function constructTreeWidget(app: JupyterFrontEnd,
     return widget;
 }
 
-
 export class AiidaTreeWidget extends Widget {
 
     public commands: CommandRegistry;
+    public dbSettings: {[key: string]: any}
     public toolbar: Toolbar;
     public processTable: HTMLTableElement;
     // public tree: HTMLElement;
@@ -38,6 +39,7 @@ export class AiidaTreeWidget extends Widget {
     public constructor(
         app: JupyterFrontEnd,
         id: string,
+        loadedSettings: ISettingRegistry.ISettings,
     ) {
         super();
         this.id = id;
@@ -46,6 +48,9 @@ export class AiidaTreeWidget extends Widget {
         this.title.closable = true;
         this.addClass("jp-aiidatreeWidget");
         this.addClass(id);
+
+        this.refreshSettings(loadedSettings)
+        loadedSettings.changed.connect(() => {this.refreshSettings(loadedSettings)})
 
         this.commands = app.commands;
 
@@ -80,9 +85,18 @@ export class AiidaTreeWidget extends Widget {
 
     }
 
+    public refreshSettings(loadedSettings: ISettingRegistry.ISettings) {
+        const keys = ["host", "port", "user", "database", "password"]
+        this.dbSettings = keys.reduce((d, k) => {d[k] = loadedSettings.get(k).composite; return d}, {} as {[key: string]: any})
+    }
+
     public async refresh() {
         if (typeof this.processTable !== 'undefined') {
-            this.node.removeChild(this.processTable)
+            try {
+                this.node.removeChild(this.processTable)
+            } catch (error) {
+                console.warn(error)
+            }
         }
         await this.buildProcessesTable()
     }
@@ -116,12 +130,12 @@ export class AiidaTreeWidget extends Widget {
 
     public buildTableRow(row: any[], id: string, icon: LabIcon) {
         const tr = document.createElement("tr");
-        
+
         row.forEach((column, index) => {
             const td = document.createElement("td");
             if (index === 0) {
                 td.className = "aiidatree-first-column"
-                icon.element({container: td, marginRight: "6px", maxHeight: "12px"});
+                icon.element({ container: td, marginRight: "6px", maxHeight: "12px" });
             }
             const content = document.createElement("span");
             content.innerHTML = `${column}`;
@@ -137,7 +151,7 @@ export class AiidaTreeWidget extends Widget {
     }
 
     public async buildProcessesTable() {
-        let processes = await queryProcesses(100)
+        let processes = await queryProcesses(100, this.dbSettings)
         processes = sortBy(processes, ['id'])
         const html = this.buildHTMLTable(['PK', 'Label', 'State']);
         for (const process of processes) {
@@ -256,13 +270,13 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
                 let icon: LabIcon
                 let arrow: '→' | '←'
                 for (const direction of ["incoming", "outgoing"]) {
-                    const links = await queryLinks(pk, direction as "incoming" | "outgoing")
+                    const links = await queryLinks(pk, direction as "incoming" | "outgoing", widget.dbSettings)
                     for (const link of links) {
                         // Take the last part of the entry point
                         const typeElements = link.nodeType.split('.')
                         icon = getIcon(link.nodeType)
                         arrow = direction === 'incoming' ? '→' : '←'
-                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length-2], arrow], `${pk}/${link.nodeId}`, icon)
+                        next_element = widget.buildTableRow([link.nodeId, typeElements[typeElements.length - 2], arrow], `${pk}/${link.nodeId}`, icon)
                         next_element.className += ` aiidatree-link-item aiidatree-link-${direction}`
                         next_element.oncontextmenu = () => {
                             widget.commands.execute(CommandIDs.setContext + ":" + widget.id, { pk: link.nodeId });
@@ -294,7 +308,7 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
             // });
             const inspect_widget = new Widget();
             const pk = typeof args['pk'] === 'undefined' ? widget.selected_pk : args['pk'] as number;
-            let data = await queryNode(pk)
+            let data = await queryNode(pk, widget.dbSettings)
             inspect_widget.id = `${widget.id}-pk-${pk}`
             inspect_widget.title.label = `Inspect Node ${pk}`
             inspect_widget.title.caption = "Inspect a node's data"
@@ -343,13 +357,13 @@ const nodeIconMatches: { type: string, icon: LabIcon }[] = [
     { type: 'process', icon: consts.rocketIcon }
 ]
 
-function getIcon(typeString: string){
-        let finalIcon = consts.fileIcon
-        for (const { type, icon } of nodeIconMatches) {
-            if (typeString.startsWith(type)) {
-                finalIcon = icon
-                break
-            }
+function getIcon(typeString: string) {
+    let finalIcon = consts.fileIcon
+    for (const { type, icon } of nodeIconMatches) {
+        if (typeString.startsWith(type)) {
+            finalIcon = icon
+            break
         }
-        return finalIcon
+    }
+    return finalIcon
 }

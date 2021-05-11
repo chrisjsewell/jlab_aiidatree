@@ -10,7 +10,7 @@ from sqlalchemy import create_engine as _create_engine
 
 @contextmanager
 def connection(
-    user="aiida", database="aiida_db", password="password", host="localhost", port=5434
+    user="aiida", database="aiidadb", password="password", host="localhost", port=5432
 ) -> Iterator[Connection]:
     engine = _create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
     with engine.connect() as conn:

@@ -62,8 +62,8 @@ export interface Process {
   icon?: 'statusSucceeded' | 'statusKilled' | 'statusFailed' | 'statusCreated' | 'statusPaused' | 'statusUnknown' | 'statusWaiting' | 'statusRunning' | 'statusExcepted'
 }
 
-export async function queryProcesses(maxRecords: number = 1) {
-    const dataToSend = { max_records: maxRecords };
+export async function queryProcesses(maxRecords: number = 1, dbSettings: {[key: string]: any}) {
+    const dataToSend = { max_records: maxRecords, ...dbSettings };
     let reply: {rows: any[], fields: string[]}
     try {
       reply = await requestAPI<any>('processes', {
@@ -81,8 +81,8 @@ export async function queryProcesses(maxRecords: number = 1) {
     return output;
 }
 
-export async function queryNode(pk: number) {
-  const dataToSend = { pk };
+export async function queryNode(pk: number, dbSettings: {[key: string]: any}) {
+  const dataToSend = { pk, ...dbSettings };
   let reply: any
   try {
     reply = await requestAPI<any>('node', {
@@ -108,8 +108,8 @@ export interface NodeLink {
   nodeType: string
 }
 
-export async function queryLinks(pk: number, direction: "incoming" | "outgoing") {
-  const dataToSend = { pk, direction };
+export async function queryLinks(pk: number, direction: "incoming" | "outgoing", dbSettings: {[key: string]: any}) {
+  const dataToSend = { pk, direction, ...dbSettings };
   let reply: {rows: any[], fields: string[]}
   try {
     reply = await requestAPI<any>('links', {
