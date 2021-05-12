@@ -1,4 +1,4 @@
-import * as lodash from 'lodash'
+import * as lodash from 'lodash';
 import { URLExt } from '@jupyterlab/coreutils';
 
 import { ServerConnection } from '@jupyterlab/services';
@@ -46,44 +46,68 @@ export async function requestAPI<T>(
   return data;
 }
 
-export interface Process {
-  id: number,
-  label: string | null,
-  description: string | null,
-  mtime: string,
-  nodeType: string,
-  processType: string,
-  processLabel: string,
-  processState: 'created' | 'running' | 'waiting' | 'finished' | 'excepted' | 'killed' | null,
-  processStatus: string | null,
-  exitStatus: number | null,
-  schedulerState: string | null,
-  paused: boolean | null,
-  icon?: 'statusSucceeded' | 'statusKilled' | 'statusFailed' | 'statusCreated' | 'statusPaused' | 'statusUnknown' | 'statusWaiting' | 'statusRunning' | 'statusExcepted'
+export interface IProcess {
+  id: number;
+  label: string | null;
+  description: string | null;
+  mtime: string;
+  nodeType: string;
+  processType: string;
+  processLabel: string;
+  processState:
+    | 'created'
+    | 'running'
+    | 'waiting'
+    | 'finished'
+    | 'excepted'
+    | 'killed'
+    | null;
+  processStatus: string | null;
+  exitStatus: number | null;
+  schedulerState: string | null;
+  paused: boolean | null;
+  icon?:
+    | 'statusSucceeded'
+    | 'statusKilled'
+    | 'statusFailed'
+    | 'statusCreated'
+    | 'statusPaused'
+    | 'statusUnknown'
+    | 'statusWaiting'
+    | 'statusRunning'
+    | 'statusExcepted';
 }
 
-export async function queryProcesses(maxRecords: number = 1, dbSettings: {[key: string]: any}) {
-    const dataToSend = { max_records: maxRecords, ...dbSettings };
-    let reply: {rows: any[], fields: string[]}
-    try {
-      reply = await requestAPI<any>('processes', {
-        body: JSON.stringify(dataToSend),
-        method: 'POST'
-      });
-    } catch (reason) {
-      console.error(
-        `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
-      );
-      // TODO deal with errors
-    }
-    const output = reply.rows.map(row => (lodash.zipObject(reply.fields, row) as unknown as Process))
-    
-    return output;
+export async function queryProcesses(
+  maxRecords = 1,
+  dbSettings: { [key: string]: any }
+) {
+  const dataToSend = { max_records: maxRecords, ...dbSettings };
+  let reply: { rows: any[]; fields: string[] };
+  try {
+    reply = await requestAPI<any>('processes', {
+      body: JSON.stringify(dataToSend),
+      method: 'POST'
+    });
+  } catch (reason) {
+    console.error(
+      `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
+    );
+    // TODO deal with errors
+  }
+  const output = reply.rows.map(
+    row => lodash.zipObject(reply.fields, row) as unknown as IProcess
+  );
+
+  return output;
 }
 
-export async function queryNode(pk: number, dbSettings: {[key: string]: any}) {
+export async function queryNode(
+  pk: number,
+  dbSettings: { [key: string]: any }
+) {
   const dataToSend = { pk, ...dbSettings };
-  let reply: any
+  let reply: any;
   try {
     reply = await requestAPI<any>('node', {
       body: JSON.stringify(dataToSend),
@@ -98,19 +122,23 @@ export async function queryNode(pk: number, dbSettings: {[key: string]: any}) {
   return reply;
 }
 
-export interface NodeLink {
-  linkDirection: 'incoming' | 'outgoing',
-  linkLabel: string,
-  linkType: string,
-  nodeId: number,
-  nodeLabel: string,
-  nodeDescription: string,
-  nodeType: string
+export interface INodeLink {
+  linkDirection: 'incoming' | 'outgoing';
+  linkLabel: string;
+  linkType: string;
+  nodeId: number;
+  nodeLabel: string;
+  nodeDescription: string;
+  nodeType: string;
 }
 
-export async function queryLinks(pk: number, direction: "incoming" | "outgoing", dbSettings: {[key: string]: any}) {
+export async function queryLinks(
+  pk: number,
+  direction: 'incoming' | 'outgoing',
+  dbSettings: { [key: string]: any }
+) {
   const dataToSend = { pk, direction, ...dbSettings };
-  let reply: {rows: any[], fields: string[]}
+  let reply: { rows: any[]; fields: string[] };
   try {
     reply = await requestAPI<any>('links', {
       body: JSON.stringify(dataToSend),
@@ -122,7 +150,9 @@ export async function queryLinks(pk: number, direction: "incoming" | "outgoing",
     );
     // TODO deal with errors
   }
-  const output = reply.rows.map(row => (lodash.zipObject(reply.fields, row) as unknown as NodeLink))
-  
+  const output = reply.rows.map(
+    row => lodash.zipObject(reply.fields, row) as unknown as INodeLink
+  );
+
   return output;
 }

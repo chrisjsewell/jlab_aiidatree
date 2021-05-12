@@ -24,4 +24,3 @@ ALTER ROLE pguser WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION B
 --
 -- PostgreSQL database cluster dump complete
 --
-
