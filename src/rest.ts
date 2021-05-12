@@ -81,7 +81,7 @@ export interface IProcess {
 export async function queryProcesses(
   maxRecords = 1,
   dbSettings: { [key: string]: any }
-) {
+): Promise<IProcess[]> {
   const dataToSend = { max_records: maxRecords, ...dbSettings };
   let reply: { rows: any[]; fields: string[] };
   try {
@@ -94,6 +94,7 @@ export async function queryProcesses(
       `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
     );
     // TODO deal with errors
+    return []
   }
   const output = reply.rows.map(
     row => lodash.zipObject(reply.fields, row) as unknown as IProcess
@@ -136,7 +137,7 @@ export async function queryLinks(
   pk: number,
   direction: 'incoming' | 'outgoing',
   dbSettings: { [key: string]: any }
-) {
+): Promise<INodeLink[]> {
   const dataToSend = { pk, direction, ...dbSettings };
   let reply: { rows: any[]; fields: string[] };
   try {
@@ -149,6 +150,7 @@ export async function queryLinks(
       `Error on POST /jlab_aiidatree/links ${dataToSend}.\n${reason}`
     );
     // TODO deal with errors
+    return []
   }
   const output = reply.rows.map(
     row => lodash.zipObject(reply.fields, row) as unknown as INodeLink

@@ -1,7 +1,14 @@
+exclude binder
+recursive-exclude binder *
+exclude docker
+recursive-exclude docker *
+
 include LICENSE
 include README.md
 include pyproject.toml
 include jupyter-config/jlab_aiidatree.json
+include schema/settings-aiidatree.json
+include images/settings.png
 
 include package.json
 include install.json
