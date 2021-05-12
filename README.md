@@ -1,18 +1,27 @@
-# jlab_aiidatree
+# jlab_aiidatree [IN-DEVELOPMENT]
 
-![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
+![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
 
-A JupyterLab extension.
 
+A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
+This is extension is intended to provide similar functionality for exploring graphs as the VS Code [AiiDA Explorer extension](https://marketplace.visualstudio.com/items?itemName=chrisjsewell.aiida-explore-vscode):
+
+- View Processes
+- Filter by process state
+- Expand processes with their incoming/outgoing nodes
+- View node attributes stored on the database
+- Visualise node graphs (with D3 Graph)
+- Visualise `StructureData` (the ThreeJS)
+
+TODO:
+
+- View Computers and attached codes
+- View Groups and attached nodes
 
 This extension is composed of a Python package named `jlab_aiidatree`
 for the server extension and a NPM package named `jlab_aiidatree`
 for the frontend extension.
-
-
-## Requirements
-
-* JupyterLab >= 3.0
 
 ## Install
 
@@ -22,6 +31,12 @@ To install the extension, execute:
 pip install jlab_aiidatree
 ```
 
+To connect to you database, ensure the setting are correct for your database (you can find these out with `verdi status`)
+
+**IMPORTANT**: The database is connected to from the server side of AiiDA Lab, i.e. where you are hosting and not necessarily on your local machine:
+
+![Settings](images/settings.png)
+
 ## Uninstall
 
 To remove the extension, execute:
@@ -30,6 +45,9 @@ To remove the extension, execute:
 pip uninstall jlab_aiidatree
 ```
 
+## Requirements
+
+* JupyterLab >= 3.0
 
 ## Troubleshoot
 
