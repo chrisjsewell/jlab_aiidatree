@@ -1,7 +1,7 @@
 # jlab_aiidatree [IN-DEVELOPMENT]
 
 ![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/master?urlpath=lab)
 
 A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
 This is extension is intended to provide similar functionality for exploring graphs as the VS Code [AiiDA Explorer extension](https://marketplace.visualstudio.com/items?itemName=chrisjsewell.aiida-explore-vscode):
@@ -118,3 +118,8 @@ pip uninstall jlab_aiidatree
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
 folder is located. Then you can remove the symlink named `jlab_aiidatree` within that folder.
+
+
+### Deploying
+
+See <https://jupyterlab.readthedocs.io/en/stable/extension/extension_tutorial.html#packaging-your-extension>
