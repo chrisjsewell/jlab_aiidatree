@@ -3,7 +3,6 @@
 ![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
 
-
 A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
 This is extension is intended to provide similar functionality for exploring graphs as the VS Code [AiiDA Explorer extension](https://marketplace.visualstudio.com/items?itemName=chrisjsewell.aiida-explore-vscode):
 
