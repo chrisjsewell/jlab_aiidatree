@@ -93,7 +93,7 @@ export async function queryProcesses(
     console.warn(
       `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
     );
-    // TODO deal with errors 
+    // TODO deal with errors
     // (we don't want to crash the program, just because the database is not available)
     return [];
   }
