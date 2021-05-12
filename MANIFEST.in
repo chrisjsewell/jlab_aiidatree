@@ -8,7 +8,7 @@ include README.md
 include pyproject.toml
 include jupyter-config/jlab_aiidatree.json
 include schema/settings-aiidatree.json
-include images/settings.png
+include images/*.png
 
 include package.json
 include install.json

@@ -90,10 +90,11 @@ export async function queryProcesses(
       method: 'POST'
     });
   } catch (reason) {
-    console.error(
+    console.warn(
       `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
     );
-    // TODO deal with errors
+    // TODO deal with errors 
+    // (we don't want to crash the program, just because the database is not available)
     return [];
   }
   const output = reply.rows.map(
@@ -115,7 +116,7 @@ export async function queryNode(
       method: 'POST'
     });
   } catch (reason) {
-    console.error(
+    console.warn(
       `Error on POST /jlab_aiidatree/node ${dataToSend}.\n${reason}`
     );
     // TODO deal with errors
@@ -146,7 +147,7 @@ export async function queryLinks(
       method: 'POST'
     });
   } catch (reason) {
-    console.error(
+    console.warn(
       `Error on POST /jlab_aiidatree/links ${dataToSend}.\n${reason}`
     );
     // TODO deal with errors

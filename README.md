@@ -18,6 +18,8 @@ TODO:
 - View Computers and attached codes
 - View Groups and attached nodes
 
+![Example](images/example.png)
+
 This extension is composed of a Python package named `jlab_aiidatree`
 for the server extension and a NPM package named `jlab_aiidatree`
 for the frontend extension.
