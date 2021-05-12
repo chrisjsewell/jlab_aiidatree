@@ -3,7 +3,6 @@
 ![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/main?urlpath=lab)
 
-
 A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
 This is extension is intended to provide similar functionality for exploring graphs as the VS Code [AiiDA Explorer extension](https://marketplace.visualstudio.com/items?itemName=chrisjsewell.aiida-explore-vscode):
 
@@ -18,6 +17,8 @@ TODO:
 
 - View Computers and attached codes
 - View Groups and attached nodes
+
+![Example](images/example.png)
 
 This extension is composed of a Python package named `jlab_aiidatree`
 for the server extension and a NPM package named `jlab_aiidatree`
