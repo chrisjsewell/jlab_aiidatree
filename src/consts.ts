@@ -6,7 +6,8 @@ export const CommandIDs = {
     setContext: "aiidatree:setContext",
     select: "aiidatree:select",
     toggle: "aiidatree:toggle",
-    launchThreeJS: "aiidatree:threejs"
+    launchThreeJS: "aiidatree:threejs",
+    launchD3: "aiidatree:d3"
 }
 
 import connectSvgstr from '../style/icons/light/connect.svg';

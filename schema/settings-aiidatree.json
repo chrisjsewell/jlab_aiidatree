@@ -4,22 +4,27 @@
   "type": "object",
   "properties": {
     "host": {
+      "description": "Name of host to connect to PostgreSQL.",
       "type": "string",
       "default": "localhost"
     },
     "port": {
+      "description": "Port number to connect to at the PostgreSQL server host.",
       "type": "number",
       "default": 5432
     },
     "user": {
+      "description": "PostgreSQL user name to connect as.",
       "type": "string",
       "default": "aiida"
     },
     "database": {
+      "description": "The PostgreSQL database name.",
       "type": "string",
       "default": "aiidadb"
     },
     "password": {
+      "description": "Password to be used if the PostgreSQL server demands password authentication.",
       "type": "string",
       "default": "password"
     }

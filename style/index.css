@@ -132,3 +132,24 @@
     min-height: 400px;
     width: 100%;
 }
+
+.d3-svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.d3-svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
+.d3-svg-container .labels {
+    fill: var(--jp-content-font-color2);
+}

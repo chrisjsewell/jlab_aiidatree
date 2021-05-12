@@ -11,7 +11,7 @@ interface Coordinates {
     z: number;
 }
 
-export class Output3DWidget extends Widget {
+export class ThreeJSWidget extends Widget {
     private scene = new THREE.Scene();
     private renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     private camera = new THREE.PerspectiveCamera(40, this.node.clientWidth / this.node.clientHeight, 1, 1000);
@@ -41,7 +41,6 @@ export class Output3DWidget extends Widget {
 
         // handle resizing
         window.addEventListener('resize', (event) => {
-            //console.log("resize")
             this.resize()
         }, false);
 
@@ -86,7 +85,6 @@ export class Output3DWidget extends Widget {
         // TODO handle errors
         const sites = data["attributes"]["sites"] as any[]
         const meshes = sites.reduce((a, site) => { a.push(this.create_atom({ x: site["position"][0], y: site["position"][1], z: site["position"][2] })); return a }, [] as THREE.Mesh[]);
-        console.log(meshes)
         this.fitCameraToMeshes(meshes, this.camera, this.controls);
         this.scene.add(...meshes);
         this.resize()

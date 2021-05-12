@@ -1,19 +1,20 @@
 import { CommandRegistry } from '@lumino/commands';
-
 import { PanelLayout, Widget } from "@lumino/widgets";
+
 import { Toolbar, ToolbarButton } from "@jupyterlab/apputils";
 import { ILayoutRestorer, JupyterFrontEnd } from "@jupyterlab/application";
 import { LabIcon, refreshIcon } from "@jupyterlab/ui-components";
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-import { sortBy } from 'lodash';
+import { sortBy, values } from 'lodash';
 
 import "../style/index.css";
 import { CommandIDs } from './consts';
 import * as consts from './consts'
 import { queryLinks, queryNode, queryProcesses } from './rest';
-import { dump } from 'js-yaml';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { Output3DWidget } from './threejs_viewer';
+import { ThreeJSWidget } from './threejs_widget';
+import { JSONWidget } from './json_widget';
+import { D3GraphWidget } from './d3graph_widget';
 
 
 export function constructTreeWidget(app: JupyterFrontEnd,
@@ -297,41 +298,45 @@ function createCoreCommands(app: JupyterFrontEnd, widget: AiidaTreeWidget) {
 
     app.commands.addCommand(CommandIDs.inspectNode + ":" + widget.id, {
         execute: async (args) => {
-            // see: https://github.com/jupyterlab/jupyterlab/blob/master/packages/docmanager-extension/src/index.ts
-            // // Create a new untitled python file
-            // const model = await app.commands.execute('docmanager:new-untitled', {
-            //     type: 'file',
-            //     ext: 'json'
-            // });
-            // // Open the newly created file with the 'Editor'
-            // return app.commands.execute('docmanager:open', {
-            //     path: model.path,
-            //     factory: 'Editor'
-            // });
-            const inspect_widget = new Widget();
             const pk = typeof args['pk'] === 'undefined' ? widget.selected_pk : args['pk'] as number;
             let data = await queryNode(pk, widget.dbSettings)
-            inspect_widget.id = `${widget.id}-pk-${pk}`
-            inspect_widget.title.label = `Inspect Node ${pk}`
-            inspect_widget.title.caption = "Inspect a node's data"
-            inspect_widget.title.closable = true
-            inspect_widget.addClass("aiidatree-yaml")
-            const pre = document.createElement("pre");
-            const code = document.createElement("code");
-            code.className = "language-yaml"
-            code.innerText = dump(data, { indent: 2 })
-            pre.appendChild(code)
-            inspect_widget.node.appendChild(pre)
-            app.shell.add(inspect_widget, 'main');
+            let inspectWidget = new JSONWidget(`${widget.id}-pk-${pk}`, `Inspect Node ${pk}`, "Inspect a node's data")
+            inspectWidget.render(data)
+            app.shell.add(inspectWidget, 'main');
         },
-    label: "Inspect"
+        label: "Inspect"
+    })
+
+    app.commands.addCommand(CommandIDs.launchD3 + ":" + widget.id, {
+        execute: async (args) => {
+            const pk = typeof args['pk'] === 'undefined' ? widget.selected_pk : args['pk'] as number;
+            const d3Widget = new D3GraphWidget(`${widget.id}-d3-${pk}`, `Graph Node ${pk}`);
+
+            const nodes_data = { pk: { name: pk } } as { [key: number]: any }
+            const links_data: any[] = []
+            // for (const direction of ["incoming", "outgoing"]) {
+            const linksIn = await queryLinks(pk, "incoming", widget.dbSettings)
+            for (const link of linksIn) {
+                nodes_data[link.nodeId] = {name: link.nodeId, ...link}
+                links_data.push({ source: pk, target: link.nodeId, direction: "incoming", ...link })
+            }
+            const linksOut = await queryLinks(pk, "outgoing", widget.dbSettings)
+            for (const link of linksOut) {
+                nodes_data[link.nodeId] = {name: link.nodeId, ...link}
+                links_data.push({ source: pk, target: link.nodeId, direction: "outgoing", ...link})
+            }
+
+            d3Widget.render(values(nodes_data), links_data, pk)
+            app.shell.add(d3Widget, 'main');
+        },
+        label: "Graph"
     })
 
     app.commands.addCommand(CommandIDs.launchThreeJS + ":" + widget.id, {
         execute: async (args) => {
             const pk = typeof args['pk'] === 'undefined' ? widget.selected_pk : args['pk'] as number;
             let data = await queryNode(pk, widget.dbSettings)
-            const threejs_widget = new Output3DWidget(`${widget.id}-view-${pk}`, `Visualise Structure ${pk}`)
+            const threejs_widget = new ThreeJSWidget(`${widget.id}-view-${pk}`, `Visualise Structure ${pk}`)
             app.shell.add(threejs_widget, 'main');
             threejs_widget.initialise()
             threejs_widget.renderStructureData(data)
@@ -350,6 +355,11 @@ function createItemsContextMenu(app: JupyterFrontEnd, widget: Widget) {
         command: CommandIDs.launchThreeJS + ":" + widget.id,
         rank: 3,
         selector: "div." + widget.id + " > table > *> .aiidatree-item-StructureData",
+    });
+    app.contextMenu.addItem({
+        command: CommandIDs.launchD3 + ":" + widget.id,
+        rank: 3,
+        selector: "div." + widget.id + " > table > *> .aiidatree-item",
     });
 
 }

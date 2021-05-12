@@ -5,7 +5,7 @@ import {
 } from '@jupyterlab/application';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-import { constructTreeWidget } from './tree';
+import { constructTreeWidget } from './tree_widget';
 
 const PLUGIN_ID = 'jlab_aiidatree:settings-aiidatree'
 
