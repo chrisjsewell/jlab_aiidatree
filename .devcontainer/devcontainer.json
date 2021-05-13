@@ -1,0 +1,7 @@
+{
+    "name": "jlab_aiidatree",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "core",
+    "workspaceFolder": "/workspace/",
+    "shutdownAction": "stopCompose"
+}

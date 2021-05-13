@@ -1,0 +1,16 @@
+name: jupyterlab-ext
+channels:
+- conda-forge
+- anaconda
+dependencies:
+- jupyterlab=3
+- nodejs
+- jupyter-packaging
+- aiida-core~=1.6
+- pre-commit
+# flask requirements
+- flask-cors~=3.0
+- flask-restful~=0.3.7
+- flask~=1.1
+- pyparsing~=2.4
+- python-memcached~=1.59

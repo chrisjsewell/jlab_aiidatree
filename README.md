@@ -29,7 +29,7 @@ for the frontend extension.
 To install the extension, execute:
 
 ```bash
-pip install jlab_aiidatree
+pip install jlab_aiidatree[aiida]
 ```
 
 To connect to you database, ensure the setting are correct for your database (you can find these out with `verdi status`)
@@ -71,7 +71,13 @@ jupyter labextension list
 
 ### Development install
 
-Note: You will need NodeJS to build the extension package.
+Note: You will need NodeJS to build the extension package, e.g.
+
+```bash
+conda create -n jupyterlab-ext --override-channels --strict-channel-priority -c conda-forge -c anaconda jupyterlab=3 nodejs jupyter-packaging aiida-core~=1.6
+conda activate jupyterlab-ext
+reentry scan
+```
 
 The `jlpm` command is JupyterLab's pinned version of
 [yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
