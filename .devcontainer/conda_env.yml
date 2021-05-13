@@ -8,6 +8,7 @@ dependencies:
 - jupyter-packaging
 - aiida-core~=1.6
 - pre-commit
+- check-manifest
 # flask requirements
 - flask-cors~=3.0
 - flask-restful~=0.3.7

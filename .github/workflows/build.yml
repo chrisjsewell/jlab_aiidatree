@@ -70,6 +70,9 @@ jobs:
         jupyter server extension list 2>&1 | grep -ie "jlab_aiidatree.*OK"
 
         jupyter labextension list 2>&1 | grep -ie "jlab_aiidatree.*OK"
+    - name: Check browser loading
+      run: |
         python -m jupyterlab.browser_check
-
+    - name: Check manifest
+      run: |
         check-manifest -v

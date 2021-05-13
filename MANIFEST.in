@@ -1,7 +1,7 @@
 exclude binder
 recursive-exclude binder *
-exclude docker
-recursive-exclude docker *
+exclude .devcontainer
+recursive-exclude .devcontainer *
 
 include LICENSE
 include README.md
