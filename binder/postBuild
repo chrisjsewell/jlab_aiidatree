@@ -57,3 +57,12 @@ _("jupyter", "labextension", "list")
 
 print("JupyterLab with jlab_aiidatree is ready to run with:\n")
 print("\tjupyter lab\n")
+
+
+# currrently issue creating postgres database: https://bugs.launchpad.net/ubuntu/+source/tzdata/+bug/1899343
+# $ initdb here
+# $ reentry scan
+# $ verdi quicksetup
+# ...
+# pytz.exceptions.UnknownTimeZoneError: '/UTC'
+# Note: adding `'Etc' +` to /srv/conda/envs/notebook/lib/python3.8/site-packages/tzlocal/unix.py::86 works

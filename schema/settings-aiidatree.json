@@ -1,6 +1,6 @@
 {
   "title": "AiiDA Explorer",
-  "description": "Parameters for connecting to the postgres database.",
+  "description": "Parameters for the AiiDA Explorer.",
   "type": "object",
   "properties": {
     "rest_url": {

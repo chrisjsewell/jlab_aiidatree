@@ -13,11 +13,6 @@ This is extension is intended to provide similar functionality for exploring gra
 - Visualise node graphs (with D3 Graph)
 - Visualise `StructureData` (the ThreeJS)
 
-TODO:
-
-- View Computers and attached codes
-- View Groups and attached nodes
-
 ![Example](images/example.png)
 
 This extension is composed of a Python package named `jlab_aiidatree`
@@ -29,14 +24,50 @@ for the frontend extension.
 To install the extension, execute:
 
 ```bash
+pip install jlab_aiidatree
+```
+
+or also with aiida-core:
+
+```bash
 pip install jlab_aiidatree[aiida]
 ```
 
-To connect to you database, ensure the setting are correct for your database (you can find these out with `verdi status`)
+## Usage
 
-**IMPORTANT**: The database is connected to from the server side of AiiDA Lab, i.e. where you are hosting and not necessarily on your local machine:
+### Connecting to AiiDA
+
+You can connect to an AiiDA instance in one of two ways:
+
+1. Directly using `aiida-core`, installed in the same environment as `jupyterlab` (the default).
+2. Through an AiiDA instance serving the AiiDA REST API.
+
+To start an AiiDA REST server, firstly `aiida-core` must be installed with the `rest` extra dependencies:
+
+```bash
+pip install aiida-core[rest]~=1.6
+```
+
+It is best to install this into a separate environment than you have your jupyterlab installation, to avoid dependency clashes.
+
+Then you can start the REST server:
+
+```console
+$ verdi restapi -H 127.0.0.5 -P 6789
+* REST API running on http://127.0.0.5:6789/api/v4
+```
+
+To connect to this server, simply change the `rest_url` setting to this URL:
 
 ![Settings](images/settings.png)
+
+:::{seealso}
+https://aiida.readthedocs.io/projects/aiida-core/en/latest/howto/share_data.html?highlight=REST#launching-the-rest-api
+:::
+
+:::{important}
+The URL is connected to from the server side of JupyterLab, i.e. where you are hosting it and not necessarily on your local machine.
+:::
 
 ## Uninstall
 
@@ -66,6 +97,10 @@ the frontend extension, check the frontend extension is installed:
 jupyter labextension list
 ```
 
+## Coming Features
+
+- View Computers and attached codes
+- View Groups and attached nodes
 
 ## Contributing
 
@@ -128,4 +163,23 @@ folder is located. Then you can remove the symlink named `jlab_aiidatree` within
 
 ### Deploying
 
-See <https://jupyterlab.readthedocs.io/en/stable/extension/extension_tutorial.html#packaging-your-extension>
+See <https://jupyterlab.readthedocs.io/en/stable/extension/extension_tutorial.html#packaging-your-extension>:
+
+1. Update the `package.json` version key
+2. Rebuild the package: `jlpm run build`
+3. Ensure all linting and tests pass
+4. Build the distribution
+
+   ```bash
+   pip install build
+   rm -rf dist
+   python -m build -s
+   python -m build
+   ```
+
+5. Upload to PyPI using `twine`
+
+   ```bash
+   pip install twine
+   twine upload --skip-existing dist/*
+   ```
