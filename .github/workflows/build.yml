@@ -2,13 +2,28 @@ name: Build
 
 on:
   push:
-    branches: master
+    branches: [master]
   pull_request:
     branches: '*'
 
 jobs:
-  build:
+
+  pre-commit:
+
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - uses: pre-commit/action@v2.0.0
+
+  build:
+
+    runs-on: ubuntu-latest
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -21,7 +36,6 @@ jobs:
       with:
         python-version: '3.8'
         architecture: 'x64'
-
 
     - name: Setup pip cache
       uses: actions/cache@v2
@@ -56,6 +70,9 @@ jobs:
         jupyter server extension list 2>&1 | grep -ie "jlab_aiidatree.*OK"
 
         jupyter labextension list 2>&1 | grep -ie "jlab_aiidatree.*OK"
+    - name: Check browser loading
+      run: |
         python -m jupyterlab.browser_check
-
+    - name: Check manifest
+      run: |
         check-manifest -v

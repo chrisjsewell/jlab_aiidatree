@@ -1,6 +1,6 @@
 {
   "name": "jlab_aiidatree",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A JupyterLab extension for exploring AiiDA databases.",
   "keywords": [
     "jupyter",

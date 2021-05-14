@@ -1,7 +1,6 @@
-import * as lodash from 'lodash';
-import { URLExt } from '@jupyterlab/coreutils';
+import { URLExt } from '@jupyterlab/coreutils'
 
-import { ServerConnection } from '@jupyterlab/services';
+import { ServerConnection } from '@jupyterlab/services'
 
 /**
  * Call the API extension
@@ -15,147 +14,244 @@ export async function requestAPI<T>(
   init: RequestInit = {}
 ): Promise<T> {
   // Make request to Jupyter API
-  const settings = ServerConnection.makeSettings();
+  const settings = ServerConnection.makeSettings()
   const requestUrl = URLExt.join(
     settings.baseUrl,
     'jlab_aiidatree', // API Namespace
     endPoint
-  );
+  )
 
-  let response: Response;
+  let response: Response
   try {
-    response = await ServerConnection.makeRequest(requestUrl, init, settings);
+    response = await ServerConnection.makeRequest(requestUrl, init, settings)
   } catch (error) {
-    throw new ServerConnection.NetworkError(error);
+    throw new ServerConnection.NetworkError(error)
   }
 
-  let data: any = await response.text();
+  let data: any = await response.text()
 
   if (data.length > 0) {
     try {
-      data = JSON.parse(data);
+      data = JSON.parse(data)
     } catch (error) {
-      console.log('Not a JSON response body.', response);
+      console.log('Not a JSON response body.', response)
     }
   }
 
   if (!response.ok) {
-    throw new ServerConnection.ResponseError(response, data.message || data);
+    throw new ServerConnection.ResponseError(response, data.message || data)
   }
 
-  return data;
+  return data
+}
+
+export async function queryNode(pk: number, url: string | null = null) {
+  // return all data for a single node
+  const dataToSend = {
+    path: [{ entity_type: '', tag: 'node' }],
+    filters: { node: { id: { '==': pk } } },
+    project: { node: ['**'] },
+    url
+  }
+  let reply: { data: { node: { [key: string]: any }[] } }
+  try {
+    reply = await requestAPI<any>('querybuilder', {
+      body: JSON.stringify(dataToSend),
+      method: 'POST'
+    })
+  } catch (reason) {
+    console.warn(
+      `Error on POST /jlab_aiidatree/querybuilder ${dataToSend}.\n${reason}`
+    )
+    // TODO deal with errors
+  }
+  if (reply.data.node.length === 0) {
+    return {} // TODO return null and handle it
+  }
+  return reply.data.node[0]
 }
 
 export interface IProcess {
-  id: number;
-  label: string | null;
-  description: string | null;
-  mtime: string;
-  nodeType: string;
-  processType: string;
-  processLabel: string;
-  processState:
+  id: number
+  // label: string | null
+  // description: string | null
+  // mtime: string
+  // nodeType: string
+  // processType: string
+  processLabel: string
+  processState?:
     | 'created'
     | 'running'
     | 'waiting'
     | 'finished'
     | 'excepted'
     | 'killed'
-    | null;
-  processStatus: string | null;
-  exitStatus: number | null;
-  schedulerState: string | null;
-  paused: boolean | null;
-  icon?:
-    | 'statusSucceeded'
-    | 'statusKilled'
-    | 'statusFailed'
-    | 'statusCreated'
-    | 'statusPaused'
-    | 'statusUnknown'
-    | 'statusWaiting'
-    | 'statusRunning'
-    | 'statusExcepted';
+  // processStatus?: string
+  // exitStatus?: number
+  // schedulerState?: string
+  // paused?: boolean
+  // icon?:
+  //   | 'statusSucceeded'
+  //   | 'statusKilled'
+  //   | 'statusFailed'
+  //   | 'statusCreated'
+  //   | 'statusPaused'
+  //   | 'statusUnknown'
+  //   | 'statusWaiting'
+  //   | 'statusRunning'
+  //   | 'statusExcepted'
 }
 
 export async function queryProcesses(
-  maxRecords = 1,
-  dbSettings: { [key: string]: any }
+  limit = 9999,
+  orderBy = 'id',
+  url: string | null = null
 ): Promise<IProcess[]> {
-  const dataToSend = { max_records: maxRecords, ...dbSettings };
-  let reply: { rows: any[]; fields: string[] };
+  // return a list of all processes
+
+  // TODO filter by process state
+
+  // const fields = ["id", "label", "description", "mtime", "node_type", "process_type", "attributes.process_label", "attributes.process_state", "attributes.process_status", "attributes.exit_status"]
+  const fields = {
+    id: 'id',
+    processLabel: 'attributes.process_label',
+    processState: 'attributes.process_state'
+  }
+  const dataToSend = {
+    path: [{ entity_type: 'process.ProcessNode.', tag: 'node' }],
+    project: { node: Object.values(fields) },
+    limit,
+    order_by: { node: { [orderBy]: 'asc' } },
+    url
+  }
+  let reply: { data: { node?: { [key: string]: any }[] } }
   try {
-    reply = await requestAPI<any>('processes', {
+    reply = await requestAPI<any>('querybuilder', {
       body: JSON.stringify(dataToSend),
       method: 'POST'
-    });
+    })
   } catch (reason) {
     console.warn(
-      `Error on POST /jlab_aiidatree/processes ${dataToSend}.\n${reason}`
-    );
+      `Error on POST /jlab_aiidatree/querybuilder ${dataToSend}.\n${reason}`
+    )
     // TODO deal with errors
     // (we don't want to crash the program, just because the database is not available)
-    return [];
+    return []
   }
-  const output = reply.rows.map(
-    row => lodash.zipObject(reply.fields, row) as unknown as IProcess
-  );
-
-  return output;
-}
-
-export async function queryNode(
-  pk: number,
-  dbSettings: { [key: string]: any }
-) {
-  const dataToSend = { pk, ...dbSettings };
-  let reply: any;
-  try {
-    reply = await requestAPI<any>('node', {
-      body: JSON.stringify(dataToSend),
-      method: 'POST'
-    });
-  } catch (reason) {
-    console.warn(
-      `Error on POST /jlab_aiidatree/node ${dataToSend}.\n${reason}`
-    );
-    // TODO deal with errors
+  if (reply.data.node === undefined) {
+    return []
   }
-  return reply;
+  return reply['data']['node'].map(row => {
+    return {
+      id: row['id'],
+      processLabel: row['attributes.process_label'],
+      processState: row['attributes.process_state']
+    } as unknown as IProcess
+  })
 }
 
 export interface INodeLink {
-  linkDirection: 'incoming' | 'outgoing';
-  linkLabel: string;
-  linkType: string;
-  nodeId: number;
-  nodeLabel: string;
-  nodeDescription: string;
-  nodeType: string;
+  linkDirection: 'incoming' | 'outgoing'
+  linkLabel: string
+  linkType: string
+  nodeId: number
+  nodeLabel: string
+  nodeDescription: string
+  nodeType: string
 }
 
-export async function queryLinks(
+export async function queryOutgoing(
   pk: number,
-  direction: 'incoming' | 'outgoing',
-  dbSettings: { [key: string]: any }
+  url: string | null = null
 ): Promise<INodeLink[]> {
-  const dataToSend = { pk, direction, ...dbSettings };
-  let reply: { rows: any[]; fields: string[] };
+  // Query all outgoing nodes for a certain node
+  const dataToSend = {
+    path: [
+      { entity_type: '', tag: 'root' },
+      { entity_type: '', tag: 'node', edge_tag: 'edge', with_incoming: 'root' }
+    ],
+    filters: {
+      root: { id: pk }
+    },
+    project: {
+      node: ['id', 'label', 'description', 'node_type'],
+      edge: ['label', 'type']
+    },
+    url
+  }
+  let reply: { data: { node?: any[]; edge?: any[] } }
   try {
-    reply = await requestAPI<any>('links', {
+    reply = await requestAPI<any>('querybuilder', {
       body: JSON.stringify(dataToSend),
       method: 'POST'
-    });
+    })
   } catch (reason) {
     console.warn(
-      `Error on POST /jlab_aiidatree/links ${dataToSend}.\n${reason}`
-    );
+      `Error on POST /jlab_aiidatree/querybuilder ${dataToSend}.\n${reason}`
+    )
     // TODO deal with errors
-    return [];
+    return []
   }
-  const output = reply.rows.map(
-    row => lodash.zipObject(reply.fields, row) as unknown as INodeLink
-  );
+  if (reply.data.node === undefined) {
+    return []
+  }
+  return reply.data.node.map((row, index) => {
+    return {
+      linkDirection: 'outgoing',
+      linkLabel: reply.data['edge'][index]['label'],
+      linkType: reply.data['edge'][index]['type'],
+      nodeId: row['id'],
+      nodeLabel: row['label'],
+      nodeDescription: row['description'],
+      nodeType: row['node_type']
+    } as unknown as INodeLink
+  })
+}
 
-  return output;
+export async function queryIncoming(
+  pk: number,
+  url: string | null = null
+): Promise<INodeLink[]> {
+  // Query all outgoing nodes for a certain node
+  const dataToSend = {
+    path: [
+      { entity_type: '', tag: 'root' },
+      { entity_type: '', tag: 'node', edge_tag: 'edge', with_outgoing: 'root' }
+    ],
+    filters: {
+      root: { id: pk }
+    },
+    project: {
+      node: ['id', 'label', 'description', 'node_type'],
+      edge: ['label', 'type']
+    },
+    url
+  }
+  let reply: { data: { node?: any[]; edge?: any[] } }
+  try {
+    reply = await requestAPI<any>('querybuilder', {
+      body: JSON.stringify(dataToSend),
+      method: 'POST'
+    })
+  } catch (reason) {
+    console.warn(
+      `Error on POST /jlab_aiidatree/querybuilder ${dataToSend}.\n${reason}`
+    )
+    // TODO deal with errors
+    return []
+  }
+  if (reply.data.node === undefined) {
+    return []
+  }
+  return reply.data.node.map((row, index) => {
+    return {
+      linkDirection: 'incoming',
+      linkLabel: reply.data['edge'][index]['label'],
+      linkType: reply.data['edge'][index]['type'],
+      nodeId: row['id'],
+      nodeLabel: row['label'],
+      nodeDescription: row['description'],
+      nodeType: row['node_type']
+    } as unknown as INodeLink
+  })
 }

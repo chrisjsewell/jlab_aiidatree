@@ -32,6 +32,7 @@ module.exports = {
       'single',
       { avoidEscape: true, allowTemplateLiterals: false }
     ],
+    semi: ['error', 'never'],
     curly: ['error', 'all'],
     eqeqeq: 'error',
     'prefer-arrow-callback': 'error'

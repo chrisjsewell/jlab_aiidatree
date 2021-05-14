@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+
+  database:
+    image: postgres:12.3
+    container_name: jlab-tree-db
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: password
+    volumes:
+      - "jlab-postgres-db:/var/lib/postgresql/data"
+    restart: always
+
+  messaging:
+    image: rabbitmq:3.8.3-management
+    container_name: jlab-tree-rmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - "jlab-rmq-data:/var/lib/rabbitmq/"
+    restart: always
+
+  core:
+    image: aiidateam/aiida-core:1.6.3
+    container_name: jlab-tree-core
+    depends_on:
+      - database
+      - messaging
+    volumes:
+      - "jlab-object-store:/root/.aiida"
+      # Mounts the project folder to '/workspace'. The target path inside the container
+      # should match what your application expects. In this case, the compose file is
+      # in a sub-folder, so you will mount '..'. You would then reference this path as the
+      # 'workspaceFolder' in '.devcontainer/devcontainer.json' so VS Code starts here.
+      - ..:/workspace:cached
+    ports:
+      - 8888:8888
+
+volumes:
+  jlab-postgres-db:
+  jlab-object-store:
+  jlab-rmq-data:

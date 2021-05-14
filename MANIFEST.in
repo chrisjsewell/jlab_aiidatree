@@ -1,10 +1,11 @@
 exclude binder
 recursive-exclude binder *
-exclude docker
-recursive-exclude docker *
+exclude .devcontainer
+recursive-exclude .devcontainer *
 
 include LICENSE
 include README.md
+include CHANGELOG.md
 include pyproject.toml
 include jupyter-config/jlab_aiidatree.json
 include schema/settings-aiidatree.json

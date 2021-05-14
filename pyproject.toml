@@ -15,3 +15,6 @@ npm = ["jlpm"]
 
 [tool.check-manifest]
 ignore = ["jlab_aiidatree/labextension/**", "yarn.lock", ".*", "package-lock.json"]
+
+[tool.isort]
+profile = "black"

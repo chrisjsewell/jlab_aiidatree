@@ -2,12 +2,12 @@ import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from '@jupyterlab/application';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
+} from '@jupyterlab/application'
+import { ISettingRegistry } from '@jupyterlab/settingregistry'
 
-import { constructTreeWidget } from './tree_widget';
+import { constructTreeWidget } from './tree_widget'
 
-const PLUGIN_ID = 'jlab_aiidatree:settings-aiidatree';
+const PLUGIN_ID = 'jlab_aiidatree:settings-aiidatree'
 
 /**
  * Initialization data for the jlab_aiidatree extension.
@@ -21,18 +21,18 @@ const extension: JupyterFrontEndPlugin<void> = {
     resolver: ILayoutRestorer,
     settings: ISettingRegistry
   ) => {
-    console.log('JupyterLab extension jlab_aiidatree is activated!');
+    console.log('JupyterLab extension jlab_aiidatree is activated!')
     // await app.restored  // this was in the tutorial but it hangs
-    const loadedSettings = await settings.load(PLUGIN_ID);
+    const loadedSettings = await settings.load(PLUGIN_ID)
     const widget = constructTreeWidget(
       app,
       'jlab_aiidatree',
       'left',
       resolver,
       loadedSettings
-    );
-    await widget.refresh();
+    )
+    await widget.refresh()
   }
-};
+}
 
-export default extension;
+export default extension
