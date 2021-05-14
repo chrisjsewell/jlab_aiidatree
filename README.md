@@ -31,6 +31,7 @@ or also with aiida-core:
 
 ```bash
 pip install jlab_aiidatree[aiida]
+reentry scan
 ```
 
 ## Usage
@@ -46,6 +47,7 @@ To start an AiiDA REST server, firstly `aiida-core` must be installed with the `
 
 ```bash
 pip install aiida-core[rest]~=1.6
+reentry scan
 ```
 
 It is best to install this into a separate environment than you have your jupyterlab installation, to avoid dependency clashes.

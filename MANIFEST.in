@@ -5,6 +5,7 @@ recursive-exclude .devcontainer *
 
 include LICENSE
 include README.md
+include CHANGELOG.md
 include pyproject.toml
 include jupyter-config/jlab_aiidatree.json
 include schema/settings-aiidatree.json
