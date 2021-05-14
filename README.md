@@ -2,6 +2,7 @@
 
 [![GH Actions][ghaction-badge]][ghaction-link]
 [![PyPI][pypi-badge]][pypi-link]
+[![npm][npm-badge]][npm-link]
 [![Binder][binder-badge]][binder-link]
 
 A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
@@ -187,9 +188,18 @@ See <https://jupyterlab.readthedocs.io/en/stable/extension/extension_tutorial.ht
    twine upload --skip-existing dist/*
    ```
 
-[pypi-badge]: https://img.shields.io/pypi/v/jlab_aiidatree.svg
-[pypi-link]: https://pypi.org/project/jlab_aiidatree
+6. Upload to NPM:
+
+   ```bash
+   npm login
+   npm publish
+   ```
+
 [ghaction-badge]: https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg
 [ghaction-link]: https://github.com/executablebooks/jlab_aiidatree
+[pypi-badge]: https://img.shields.io/pypi/v/jlab_aiidatree.svg
+[pypi-link]: https://pypi.org/project/jlab_aiidatree
+[npm-badge]: https://img.shields.io/npm/v/jlab_aiidatree
+[npm-link]: https://www.npmjs.com/package/jlab_aiidatree
 [binder-badge]: https://mybinder.org/badge_logo.svg
 [binder-link]: https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/master?urlpath=lab
