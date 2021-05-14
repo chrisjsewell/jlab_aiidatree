@@ -36,6 +36,18 @@ _(sys.executable, "-m", "pip", "install", "-e", ".")
 # verify the environment the extension didn't break anything
 _(sys.executable, "-m", "pip", "check")
 
+# Install the node dependencies
+_("jlpm")
+
+# build the labextension
+_("jlpm", "run", "build")
+
+# link the labextension to JupyterLab
+_("jupyter", "labextension", "develop", ".", "--overwrite")
+
+# install server
+_("jupyter", "server", "extension", "enable", "jlab_aiidatree")
+
 # list the extensions
 _("jupyter", "server", "extension", "list")
 
