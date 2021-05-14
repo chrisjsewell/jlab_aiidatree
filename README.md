@@ -1,7 +1,8 @@
 # jlab_aiidatree [IN-DEVELOPMENT]
 
-![Github Actions Status](https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/master?urlpath=lab)
+[![GH Actions][ghaction-badge]][ghaction-link]
+[![PyPI][pypi-badge]][pypi-link]
+[![Binder][binder-badge]][binder-link]
 
 A JupyterLab extension for exploring [AiiDA](https://www.aiida.net/) databases.
 This is extension is intended to provide similar functionality for exploring graphs as the VS Code [AiiDA Explorer extension](https://marketplace.visualstudio.com/items?itemName=chrisjsewell.aiida-explore-vscode):
@@ -13,7 +14,7 @@ This is extension is intended to provide similar functionality for exploring gra
 - Visualise node graphs (with D3 Graph)
 - Visualise `StructureData` (the ThreeJS)
 
-![Example](images/example.png)
+![Example Image](images/example.png)
 
 This extension is composed of a Python package named `jlab_aiidatree`
 for the server extension and a NPM package named `jlab_aiidatree`
@@ -61,7 +62,7 @@ $ verdi restapi -H 127.0.0.5 -P 6789
 
 To connect to this server, simply change the `rest_url` setting to this URL:
 
-![Settings](images/settings.png)
+![Settings Image](images/settings.png)
 
 :::{seealso}
 https://aiida.readthedocs.io/projects/aiida-core/en/latest/howto/share_data.html?highlight=REST#launching-the-rest-api
@@ -185,3 +186,10 @@ See <https://jupyterlab.readthedocs.io/en/stable/extension/extension_tutorial.ht
    pip install twine
    twine upload --skip-existing dist/*
    ```
+
+[pypi-badge]: https://img.shields.io/pypi/v/jlab_aiidatree.svg
+[pypi-link]: https://pypi.org/project/jlab_aiidatree
+[ghaction-badge]: https://github.com/chrisjsewell/jlab_aiidatree/workflows/Build/badge.svg
+[ghaction-link]: https://github.com/executablebooks/jlab_aiidatree
+[binder-badge]: https://mybinder.org/badge_logo.svg
+[binder-link]: https://mybinder.org/v2/gh/chrisjsewell/jlab_aiidatree/master?urlpath=lab
