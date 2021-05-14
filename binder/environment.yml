@@ -18,5 +18,6 @@ dependencies:
   - pip
   - wheel
   # additional packages for demos
-  - aiida-core ~=1.6
+  - aiida-core ~=1.6.3
+  - psycopg2-binary ~=2.8,>=2.8.3 # will be added to aiida-core soon
   - postgresql >=9.6
